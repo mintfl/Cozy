@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>A Little Cozy Corner</title>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --pico-font-family: "Quicksand", sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(
+        180deg,
+        #1f1a17,
+        #2b241e,
+        #352d24
+    );
+    color:#f7efe4;
+    padding:20px;
+}
+
+main{
+    max-width:600px;
+    margin:auto;
+}
+
+.card{
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(10px);
+    border-radius:20px;
+    padding:24px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+button{
+
+    display:block;
+    margin:0 auto;
+
+    background:#8B5E3C;
+    border:none;
+
+    color:#FFF5E6;
+
+    border-radius:999px;
+
+    padding:12px 24px;
+
+    font-weight:600;
+
+    transition:all .3s ease;
+}
+
+button:hover{
+
+    background:#A47148;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 4px 12px rgba(212,163,115,.35);
+}
+
+button:active{
+
+    transform:translateY(0px);
+}
+
+
+h1{
+    text-align:center;
+    margin-top:20px;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    text-align:center;
+    opacity:.8;
+    margin-bottom:30px;
+}
+
+#affirmation{
+    font-size:1.15rem;
+    text-align:center;
+    min-height:70px;
+}
+
+.button-center{
+    display:flex;
+    justify-content:center;
+}
+
+textarea{
+    resize:none;
+}
+
+.burned{
+    animation:fadeAway 1.2s forwards;
+}
+
+@keyframes fadeAway{
+    0%{
+        opacity:1;
+        transform:scale(1);
+    }
+    100%{
+        opacity:0;
+        transform:scale(.8);
+    }
+}
+
+footer{
+    text-align:center;
+    opacity:.6;
+    margin-top:20px;
+}
+
+/* Music Button */
+
+#musicPlayer{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+
+    width:80px;
+    height:80px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:3.5rem;
+
+    cursor:pointer;
+    user-select:none;
+
+    z-index:999;
+
+    animation:spin 5s linear infinite;
+
+    filter:drop-shadow(0 0 10px rgba(255,200,120,.4));
+}
+
+#musicPlayer.paused{
+    animation-play-state:paused;
+    opacity:.7;
+}
+
+#musicPlayer.playing{
+    filter:
+        drop-shadow(0 0 8px #ffd180)
+        drop-shadow(0 0 18px #ffb74d);
+}
+
+.musicHint{
+    position:fixed;
+    bottom:105px;
+    right:15px;
+
+    font-size:.8rem;
+
+    background:rgba(0,0,0,.25);
+
+    padding:8px 12px;
+
+    border-radius:12px;
+
+    opacity:.8;
+}
+
+@keyframes spin{
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<main>
+
+<h1>A Little Cozy Corner</h1>
+
+<p class="subtitle">
+Happy Birthday! 🎉
+</p>
+
+<div class="card">
+
+
+<h3>☀️ Today's Affirmation</h3>
+
+<p id="affirmation">
+Click below for today's message.
+</p>
+
+<div class="button-center">
+    <button onclick="newAffirmation()">
+        ✨ New Affirmation
+    </button>
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>🔥 Thought Burner</h3>
+
+<p>
+Write down anything bothering you.
+Then burn it.
+</p>
+
+<textarea
+id="thought"
+rows="5"
+placeholder="Write whatever is on your mind..."
+></textarea>
+
+<div class="button-center">
+    <button onclick="burnThought()">
+        🔥 Burn Thought
+    </button>
+</div>
+
+<p id="burnMessage"></p>
+
+</div>
+
+<footer>
+    Make  sure to comeback when you need to!
+</footer>
+
+</main>
+
+<!-- Floating Music Button -->
+
+<div class="musicHint">
+Tap the disc to play some cozy music 🎵
+</div>
+
+<div
+id="musicPlayer"
+class="paused"
+onclick="toggleMusic()"
+>
+💿
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+const affirmations = [
+
+"You are doing better than you think.",
+
+"You don't need to have everything figured out today.",
+
+"Your feelings are valid.",
+
+"Small progress is still progress.",
+
+"You deserve kindness, especially from yourself.",
+
+"The world is better because you're in it.",
+
+"Someone is grateful that you exist.", 
+
+"You bring more light into people's lives than you realize.", 
+
+"You deserve the same kindness you give to others.", 
+
+"The people who care about you are lucky to know you.", 
+
+"Your presence makes ordinary days a little brighter.", 
+
+"You don't need to be perfect to be loved.", 
+
+"Today is better because you're here.", 
+
+"The world wouldn't be quite the same without you.", 
+
+"You are appreciated more than you know.", 
+
+"The world is lucky to have you.",
+
+"Resting is not falling behind.",
+
+"One difficult day does not define you.",
+
+"You've survived every hard day so far.",
+
+"You are enough exactly as you are.",
+
+"Take a breath. You're okay.",
+
+"Your future self is cheering for you."
+
+];
+
+function newAffirmation(){
+
+const random =
+affirmations[
+Math.floor(
+Math.random()*affirmations.length
+)
+];
+
+document.getElementById("affirmation").innerText =
+random;
+
+}
+
+function burnThought(){
+
+const textarea =
+document.getElementById("thought");
+
+const message =
+document.getElementById("burnMessage");
+
+if(textarea.value.trim() === ""){
+return;
+}
+
+textarea.classList.add("burned");
+
+setTimeout(()=>{
+
+textarea.value="";
+
+textarea.classList.remove("burned");
+
+message.innerHTML =
+"✨ Your thought has been released.";
+
+setTimeout(()=>{
+message.innerHTML="";
+},3000);
+
+},1000);
+
+}
+
+/* Music */
+
+const music =
+document.getElementById("bgMusic");
+
+const player =
+document.getElementById("musicPlayer");
+
+let isPlaying = false;
+
+function toggleMusic(){
+
+    if(!isPlaying){
+
+        music.currentTime = 0;
+
+        music.volume = 0.25;
+
+        music.play();
+
+        player.classList.remove("paused");
+        player.classList.add("playing");
+
+        isPlaying = true;
+
+    }else{
+
+        music.pause();
+
+        music.currentTime = 0;
+
+        player.classList.remove("playing");
+        player.classList.add("paused");
+
+        isPlaying = false;
+    }
+}
+
+newAffirmation();
+
+</script>
+
+</body>
+</html>
+
+
+
